@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(name='python-guidestar',
       version='0.1',
-      description='Python client library for Guidestart API',
+      description='Python client library for Guidestar API',
       url='http://github.com/rmaceissoft/python-guidestar',
       author='Reiner Marquez',
       author_email='rmaceissoft@gmail.com',
