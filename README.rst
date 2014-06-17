@@ -20,10 +20,18 @@ Usage
 
 Search organizations by ein code::
 
-    from guidestar.api import Api
+    from guidestar.api import Api, FilterBy
 
     client = Api(username="foobar@gmail.com", password="123")
-    organizations = client.search(ein="54-1774039")
+    organizations = client.search("54-1774039", FilterBy.EIN)
+
+
+Search organizations by name (page 2 limited to 15)::
+
+    from guidestar.api import Api, FilterBy
+
+    client = Api(username="foobar@gmail.com", password="123")
+    organizations = client.search("54-1774039", FilterBy.ORGANIZATION_NAME, page=2, limit=15)
 
 
 Get Details for a given organization::

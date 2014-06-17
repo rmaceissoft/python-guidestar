@@ -3,8 +3,22 @@ import json
 import urllib
 
 import requests
+from requests.exceptions import RequestException, HTTPError
 
 from guidestar.entities import Organization
+from guidestar.exceptions import EXCEPTIONS_MAPPING, GuidestarError
+
+
+class FilterBy(object):
+    """ different filters used on search api endpoint
+
+    """
+    KEYWORD = 'keyword'
+    EIN = 'ein'
+    ZIP = 'zip'
+    ORGANIZATION_NAME = 'organization_name'
+
+    CHOICES = (KEYWORD, EIN, ZIP, ORGANIZATION_NAME, )
 
 
 class Api(object):
@@ -21,24 +35,36 @@ class Api(object):
     def _auth(self):
         return self._username, self._password
 
-    def search(self, ein=None, zip=None, keyword=None):
-        value = None
-        if ein:
-            value = 'ein:%s' % ein
-        elif zip:
-            value = 'zip:%s' % zip
-        elif keyword:
-            value = 'keyword:%s' % keyword
-        if value:
-            mapping = {'q': value}
+    def search(self, q, filter_by=FilterBy.KEYWORD, page=1, limit=10):
+        if filter_by not in FilterBy.CHOICES:
+            raise RuntimeError("not valid filter_by value")
+        value = '%s:%s' % (filter_by, q)
+        mapping = {
+            'q': value,
+            'p': page,
+            'r': limit
+        }
         url = self._base_url + 'search?%s' % urllib.urlencode(mapping)
-        response = requests.get(url, auth=self._auth)
-        response_json = json.loads(response.content)
+        response_json = self._do_request(url)
         return Organization.parse_list(response_json)
 
     def get_details(self, org_id):
         url = self._base_url + 'detail/%s' % org_id
-        response = requests.get(url, auth=self._auth)
-        response_json = json.loads(response.content)
+        response_json = self._do_request(url)
         return Organization.parse(response_json)
+
+    def _do_request(self, url):
+        try:
+            response = requests.get(url, auth=self._auth)
+        except RequestException, ex:
+            raise GuidestarError()
+        else:
+            try:
+                response.raise_for_status()
+            except HTTPError, ex:
+                exception_class = EXCEPTIONS_MAPPING.get(ex.response.status_code, GuidestarError)
+                raise exception_class(response=ex.response)
+            else:
+                response_json = json.loads(response.content)
+        return response_json
 
