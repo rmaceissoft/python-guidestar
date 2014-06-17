@@ -46,7 +46,7 @@ class Api(object):
         }
         url = self._base_url + 'search?%s' % urllib.urlencode(mapping)
         response_json = self._do_request(url)
-        return Organization.parse_list(response_json)
+        return Organization.parse_list(response_json, limit, page)
 
     def get_details(self, org_id):
         url = self._base_url + 'detail/%s' % org_id
