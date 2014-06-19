@@ -54,8 +54,11 @@ class Api(object):
         return Organization.parse(response_json)
 
     def _do_request(self, url):
+        headers = {
+            'X-Referring-Integrator': self._username
+        }
         try:
-            response = requests.get(url, auth=self._auth)
+            response = requests.get(url, headers=headers, auth=self._auth)
         except RequestException, ex:
             raise GuidestarError()
         else:
