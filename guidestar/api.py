@@ -35,7 +35,7 @@ class Api(object):
     def _auth(self):
         return self._username, self._password
 
-    def search(self, q, filter_by=FilterBy.KEYWORD, page=1, limit=10):
+    def search(self, q, filter_by=FilterBy.KEYWORD, page=1, limit=10, url_path=None):
         if filter_by not in FilterBy.CHOICES:
             raise RuntimeError("not valid filter_by value")
         value = '%s:%s' % (filter_by, q)
@@ -44,9 +44,13 @@ class Api(object):
             'p': page,
             'r': limit
         }
-        url = self._base_url + 'search?%s' % urllib.urlencode(mapping)
+        url_path = url_path or 'search?%s'
+        url = self._base_url + url_path % urllib.urlencode(mapping)
         response_json = self._do_request(url)
         return Organization.parse_list(response_json, limit, page)
+
+    def advanced_search(self, q, filter_by=FilterBy.KEYWORD, page=1, limit=10):
+        return self.search(q, filter_by=filter_by, page=page, limit=limit, url_path='advancedsearch?%s')
 
     def get_details(self, org_id):
         url = self._base_url + 'detail/%s' % org_id
