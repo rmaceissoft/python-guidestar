@@ -74,4 +74,3 @@ class Api(object):
             else:
                 response_json = json.loads(response.content)
         return response_json
-

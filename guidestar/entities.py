@@ -57,7 +57,7 @@ class Item(object):
         return pickle
 
     def __getattr__(self, name):
-        #invoken when refering to attribute that it is not valid or it was not present at json response
+        # invoken when refering to attribute that it is not valid or it was not present at json response
         return None
 
     @classmethod
@@ -126,6 +126,3 @@ class Organization(Item):
         items = super(Organization, cls).parse_list(json)
         items.paginator = Paginator(per_page, json.get('total_hits'), num_page)
         return items
-
-
-
