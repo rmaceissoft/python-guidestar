@@ -53,7 +53,7 @@ class Api(object):
         return self.search(q, filter_by=filter_by, page=page, limit=limit, url_path='advancedsearch?%s')
 
     def get_details(self, org_id):
-        url = self._base_url + 'detail/%s' % org_id
+        url = self._base_url + 'detail/%s.json' % org_id
         response_json = self._do_request(url)
         return Organization.parse(response_json)
 
